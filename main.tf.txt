@@ -1,0 +1,179 @@
+provider "aws" {
+  region = "us-east-2"
+}
+
+# Define the VPC
+resource "aws_vpc" "vpc1" {
+  cidr_block = "10.0.0.0/16"
+  tags = {
+    Name = "vpc1"
+  }
+}
+
+# Define the public subnets
+resource "aws_subnet" "public_1" {
+  vpc_id = aws_vpc.vpc1.id
+  cidr_block = "10.0.1.0/24"
+  availability_zone = "us-east-2a"
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "public-subnet-1"
+  }
+}
+
+resource "aws_subnet" "public_2" {
+  vpc_id = aws_vpc.vpc1.id
+  cidr_block = "10.0.2.0/24"
+  availability_zone = "us-east-2b"
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "public-subnet-2"
+  }
+}
+
+# Define the private subnets
+resource "aws_subnet" "private_1" {
+  vpc_id = aws_vpc.vpc1.id
+  cidr_block = "10.0.3.0/24"
+  availability_zone = "us-east-2a"
+  tags = {
+    Name = "private-subnet-1"
+  }
+}
+
+resource "aws_subnet" "private_2" {
+  vpc_id = aws_vpc.vpc1.id
+  cidr_block = "10.0.4.0/24"
+  availability_zone = "us-east-2b"
+  tags = {
+    Name = "private-subnet-2"
+  }
+}
+
+# Define the Internet Gateway
+resource "aws_internet_gateway" "igw1" {
+  vpc_id = aws_vpc.vpc1.id
+  tags = {
+    Name = "igw1"
+  }
+}
+
+# Define the public route table
+resource "aws_route_table" "public_rt" {
+  vpc_id = aws_vpc.vpc1.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw1.id
+  }
+  tags = {
+    Name = "public-route-table"
+  }
+}
+
+# Associate the route table with the public subnets
+resource "aws_route_table_association" "public_1_association" {
+  subnet_id = aws_subnet.public_1.id
+  route_table_id = aws_route_table.public_rt.id
+}
+
+resource "aws_route_table_association" "public_2_association" {
+  subnet_id = aws_subnet.public_2.id
+  route_table_id = aws_route_table.public_rt.id
+}
+
+# Define Elastic IPs for NAT Gateways
+resource "aws_eip" "nat_1" {
+  domain = "vpc"
+  tags = {
+    Name = "nat-eip-1"
+  }
+}
+
+resource "aws_eip" "nat_2" {
+  domain = "vpc"
+  tags = {
+    Name = "nat-eip-2"
+  }
+}
+
+# Define the NAT Gateways
+resource "aws_nat_gateway" "nat_1" {
+  allocation_id = aws_eip.nat_1.id
+  subnet_id = aws_subnet.public_1.id
+  tags = {
+    Name = "nat-gateway-1"
+  }
+}
+
+resource "aws_nat_gateway" "nat_2" {
+  allocation_id = aws_eip.nat_2.id
+  subnet_id = aws_subnet.public_2.id
+  tags = {
+    Name = "nat-gateway-2"
+  }
+}
+
+# Define the private route table with routes to the NAT Gateways
+resource "aws_route_table" "private_rt" {
+  vpc_id = aws_vpc.vpc1.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_1.id
+  }
+  tags = {
+    Name = "private-route-table"
+  }
+}
+
+# Associate the route table with the private subnets
+resource "aws_route_table_association" "private_1_association" {
+  subnet_id = aws_subnet.private_1.id
+  route_table_id = aws_route_table.private_rt.id
+}
+
+resource "aws_route_table_association" "private_2_association" {
+  subnet_id = aws_subnet.private_2.id
+  route_table_id = aws_route_table.private_rt.id
+}
+
+# Define EC2 instances in public subnets
+resource "aws_instance" "public_instance_1" {
+  ami = "ami-xxxxxxxxxxxxxx"
+  instance_type = "t2.micro"
+  subnet_id = aws_subnet.public_1.id
+
+  tags = {
+    Name = "PublicInstance1"
+  }
+}
+
+resource "aws_instance" "public_instance_2" {
+  ami = "ami-xxxxxxxxxxxxxx"
+  instance_type = "t2.micro"
+  subnet_id = aws_subnet.public_2.id
+
+  tags = {
+    Name = "PublicInstance2"
+  }
+}
+
+# Define EC2 instances in private subnets
+resource "aws_instance" "private_instance_1" {
+  ami = "ami-xxxxxxxxxxxxxx"
+  instance_type = "t2.micro"
+  subnet_id = aws_subnet.private_1.id
+
+  tags = {
+    Name = "PrivateInstance1"
+  }
+}
+
+resource "aws_instance" "private_instance_2" {
+  ami = "ami-xxxxxxxxxxxxxx"
+  instance_type = "t2.micro"
+  subnet_id = aws_subnet.private_2.id
+
+  tags = {
+    Name = "PrivateInstance2"
+  }
+}
