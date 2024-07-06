@@ -34,21 +34,25 @@ cd your-repo
 Initialize the Terraform working directory.
 
 
-```terraform init
+```sh
+terraform init
    ```
 ### Review and Apply the Configuration
 Review the Terraform plan to see what resources will be created.
 
-```terraform plan
+```sh
+terraform plan
    ```
 If everything looks good, apply the configuration to create the resources.
 
-```terraform apply
+```sh
+terraform apply
    ```
 ### Destroy the Infrastructure
 When the resources are no longer needed and in order to avoid charges, the infrastructures were all destroyed.
 
-```terraform destroy
+```sh
+terraform destroy
    ```
 
 ### Terraform Files
