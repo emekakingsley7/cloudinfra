@@ -27,6 +27,7 @@ The following AWS resources are provisioned by this Terraform configuration:
 ```sh
 git clone https://github.com/yourusername/your-repo.git
 cd your-repo
+```
 
 ## Getting Started
 
