@@ -6,7 +6,7 @@ This project provisions and manages AWS infrastructure using Terraform. The infr
 
 ## Prerequisites
 
--Visual Studio Code insattled on local machine
+- Visual Studio Code insattled on local machine
 - [Terraform] installed on VS code.
 - AWS account with sufficient permissions to create and manage resources.
 - AWS CLI configured with appropriate credentials.
