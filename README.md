@@ -30,6 +30,7 @@ cd your-repo
 ```
 
 ## Getting Started
+After coding, the next is to deploy the resources to the cloud (AWS) environment
 
 ### Initialize Terraform
 Initialize the Terraform working directory.
